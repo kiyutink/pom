@@ -31,7 +31,6 @@ func (p *pom) init() {
 		title:   "Start",
 		tooltip: "Start the timer",
 		handler: func() {
-
 			p.countdown = &countdown{
 				dur: p.remaining,
 				per: time.Second,
@@ -64,7 +63,11 @@ func (p *pom) init() {
 		title:   "Reset",
 		tooltip: "Reset the timer",
 		handler: func() {
-			fmt.Println("reset clicked")
+			p.countdown.stop()
+			p.pauseButton.hide()
+			p.startButton.show()
+			p.remaining = r
+			systray.SetTitle(p.remaining.Round(time.Second).String())
 		},
 	}
 	p.resetButton.init()
@@ -73,7 +76,7 @@ func (p *pom) init() {
 		title:   "Quit",
 		tooltip: "Quit the app",
 		handler: func() {
-			fmt.Println("quit clicked")
+			systray.Quit()
 		},
 	}
 	p.quitButton.init()
