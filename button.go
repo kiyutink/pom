@@ -1,6 +1,8 @@
 package main
 
-import "github.com/getlantern/systray"
+import (
+	"github.com/getlantern/systray"
+)
 
 type button struct {
 	title   string
@@ -14,7 +16,9 @@ func (b *button) init() {
 	b.mItem = systray.AddMenuItem(b.title, b.tooltip)
 	go func() {
 		for range b.mItem.ClickedCh {
-			b.handler()
+			go func() {
+				b.handler()
+			}()
 		}
 	}()
 }

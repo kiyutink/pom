@@ -18,6 +18,7 @@ const (
 type pom struct {
 	mode        mode
 	remaining   time.Duration
+	countdown   *countdown
 	startButton *button
 	pauseButton *button
 	resetButton *button
@@ -30,7 +31,19 @@ func (p *pom) init() {
 		title:   "Start",
 		tooltip: "Start the timer",
 		handler: func() {
-			fmt.Println("start clicked")
+
+			p.countdown = &countdown{
+				dur: p.remaining,
+				per: time.Second,
+				handler: func(r time.Duration) {
+					p.remaining = r
+					systray.SetTitle(p.remaining.Round(time.Second).String())
+				},
+			}
+			p.startButton.hide()
+			p.pauseButton.show()
+			p.countdown.start()
+			fmt.Println("countdown over")
 		},
 	}
 	p.startButton.init()
@@ -39,7 +52,9 @@ func (p *pom) init() {
 		title:   "Pause",
 		tooltip: "Pause the timer",
 		handler: func() {
-			fmt.Println("pause clicked")
+			p.pauseButton.hide()
+			p.startButton.show()
+			p.countdown.stop()
 		},
 	}
 	p.pauseButton.init()
