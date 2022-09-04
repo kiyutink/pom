@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/getlantern/systray"
@@ -26,7 +27,7 @@ type pom struct {
 }
 
 func (p *pom) init() {
-	systray.SetTitle(p.remaining.Round(time.Second).String())
+	p.render()
 	p.startButton = &button{
 		title:   "Start",
 		tooltip: "Start the timer",
@@ -36,7 +37,7 @@ func (p *pom) init() {
 				per: time.Second,
 				handler: func(r time.Duration) {
 					p.remaining = r
-					systray.SetTitle(p.remaining.Round(time.Second).String())
+					p.render()
 				},
 			}
 			p.setActive()
@@ -51,7 +52,7 @@ func (p *pom) init() {
 				p.sound.play()
 			}
 			p.setPaused()
-			systray.SetTitle(p.remaining.Round(time.Second).String())
+			p.render()
 		},
 	}
 	p.startButton.init()
@@ -74,7 +75,7 @@ func (p *pom) init() {
 			p.countdown.stop()
 			p.setPaused()
 			p.remaining = r
-			systray.SetTitle(p.remaining.Round(time.Second).String())
+			p.render()
 		},
 	}
 	p.resetButton.init()
@@ -104,4 +105,13 @@ func (p *pom) setActive() {
 func (p *pom) setPaused() {
 	p.pauseButton.hide()
 	p.startButton.show()
+}
+
+func (p *pom) render() {
+	emoji := "👨‍💻"
+	if p.mode == rest {
+		emoji = "🌴"
+	}
+	text := fmt.Sprintf("%v %v", emoji, p.remaining.Round(time.Second).String())
+	systray.SetTitle(text)
 }
