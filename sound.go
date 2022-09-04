@@ -1,8 +1,8 @@
 package main
 
 import (
+	"io"
 	"log"
-	"os"
 	"time"
 
 	"github.com/faiface/beep"
@@ -11,16 +11,13 @@ import (
 )
 
 type sound struct {
-	filePath string
+	file     io.ReadCloser
 	streamer beep.StreamSeekCloser
 }
 
 func (s *sound) init() {
-	f, err := os.Open(s.filePath)
-	if err != nil {
-		log.Fatal(err)
-	}
-	streamer, format, err := mp3.Decode(f)
+	
+	streamer, format, err := mp3.Decode(s.file)
 	if err != nil {
 		log.Fatal(err)
 	}
