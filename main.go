@@ -7,9 +7,9 @@ import (
 )
 
 const (
-	configWorkDuration = time.Second * 5
-	configRestDuration = time.Second * 3
-	r                  = time.Second * 5
+	configWorkDuration = time.Minute * 25
+	configRestDuration = time.Minute * 5
+	r                  = configWorkDuration
 	m                  = work
 )
 
