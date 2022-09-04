@@ -22,6 +22,7 @@ type pom struct {
 	pauseButton *button
 	resetButton *button
 	quitButton  *button
+	sound       *sound
 }
 
 func (p *pom) init() {
@@ -47,6 +48,7 @@ func (p *pom) init() {
 					p.remaining = configWorkDuration
 				}
 				p.toggleMode()
+				p.sound.play()
 			}
 			p.setPaused()
 			systray.SetTitle(p.remaining.Round(time.Second).String())
