@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"time"
 )
 
@@ -14,22 +15,26 @@ type countdown struct {
 	done    chan struct{}
 }
 
+var errStopped = errors.New("countdown stopped")
+
 // start will block until time runs out or until stop is called. TODO: doesn't return when time runs out
 // TODO: this should accept context
-func (c *countdown) start() {
+func (c *countdown) start() error {
 	c.ticker = time.NewTicker(c.per)
 	defer c.ticker.Stop()
 	c.started = time.Now()
 	c.done = make(chan struct{})
-	defer func() { c.done <- struct{}{} }()
 	for {
 		select {
 		case t := <-c.ticker.C:
 			passed := t.Sub(c.started)
 			c.handler(c.dur - passed)
+			if passed >= c.dur {
+				return nil
+			}
 
 		case <-c.done:
-			return
+			return errStopped
 		}
 	}
 }

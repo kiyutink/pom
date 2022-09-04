@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/getlantern/systray"
@@ -39,10 +38,18 @@ func (p *pom) init() {
 					systray.SetTitle(p.remaining.Round(time.Second).String())
 				},
 			}
-			p.startButton.hide()
-			p.pauseButton.show()
-			p.countdown.start()
-			fmt.Println("countdown over")
+			p.setActive()
+			err := p.countdown.start()
+			if err != errStopped {
+				if p.mode == work {
+					p.remaining = configRestDuration
+				} else {
+					p.remaining = configWorkDuration
+				}
+				p.toggleMode()
+			}
+			p.setPaused()
+			systray.SetTitle(p.remaining.Round(time.Second).String())
 		},
 	}
 	p.startButton.init()
@@ -51,8 +58,7 @@ func (p *pom) init() {
 		title:   "Pause",
 		tooltip: "Pause the timer",
 		handler: func() {
-			p.pauseButton.hide()
-			p.startButton.show()
+			p.setPaused()
 			p.countdown.stop()
 		},
 	}
@@ -64,8 +70,7 @@ func (p *pom) init() {
 		tooltip: "Reset the timer",
 		handler: func() {
 			p.countdown.stop()
-			p.pauseButton.hide()
-			p.startButton.show()
+			p.setPaused()
 			p.remaining = r
 			systray.SetTitle(p.remaining.Round(time.Second).String())
 		},
@@ -80,4 +85,21 @@ func (p *pom) init() {
 		},
 	}
 	p.quitButton.init()
+}
+
+func (p *pom) toggleMode() {
+	p.mode = map[mode]mode{
+		work: rest,
+		rest: work,
+	}[p.mode]
+}
+
+func (p *pom) setActive() {
+	p.pauseButton.show()
+	p.startButton.hide()
+}
+
+func (p *pom) setPaused() {
+	p.pauseButton.hide()
+	p.startButton.show()
 }

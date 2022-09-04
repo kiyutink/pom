@@ -6,9 +6,13 @@ import (
 	"github.com/getlantern/systray"
 )
 
+// https://google.com
+
 const (
-	r = time.Minute * 25
-	m = work
+	configWorkDuration = time.Second * 5
+	configRestDuration = time.Second * 3
+	r                  = time.Second * 5
+	m                  = work
 )
 
 func main() {
