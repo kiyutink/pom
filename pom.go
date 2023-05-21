@@ -16,14 +16,15 @@ const (
 )
 
 type pom struct {
-	mode        mode
-	remaining   time.Duration
-	countdown   *countdown
-	startButton *button
-	pauseButton *button
-	resetButton *button
-	quitButton  *button
-	sound       *sound
+	mode             mode
+	remaining        time.Duration
+	countdown        *countdown
+	startButton      *button
+	pauseButton      *button
+	resetButton      *button
+	quitButton       *button
+	toggleModeButton *button
+	sound            *sound
 }
 
 func (p *pom) init() {
@@ -72,13 +73,34 @@ func (p *pom) init() {
 		title:   "Reset",
 		tooltip: "Reset the timer",
 		handler: func() {
-			p.countdown.stop()
+			if p.countdown != nil {
+				p.countdown.stop()
+			}
 			p.setPaused()
 			p.remaining = r
 			p.render()
 		},
 	}
 	p.resetButton.init()
+
+	p.toggleModeButton = &button{
+		title:   "Toggle mode",
+		tooltip: "Toggle mode and reset the timer",
+		handler: func() {
+			if p.countdown != nil {
+				p.countdown.stop()
+			}
+			p.setPaused()
+			p.toggleMode()
+			if p.mode == work {
+				p.remaining = configWorkDuration
+			} else {
+				p.remaining = configRestDuration
+			}
+			p.render()
+		},
+	}
+	p.toggleModeButton.init()
 
 	p.quitButton = &button{
 		title:   "Quit",
